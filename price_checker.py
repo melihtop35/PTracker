@@ -17,7 +17,7 @@ def amazon_product_info(URL):
     else:
         title = "Ürün Bulunamadı"
 
-    price_tag = soup.find("span", class_="a-offscreen")
+    price_tag = soup.find("span", class_="a-price-whole")
     if price_tag:
         price_text = price_tag.get_text()
         price_text = price_text.split(",")[0]
@@ -35,9 +35,9 @@ def akakce_product_info(URL):
     page = requests.get(URL, headers=headers)
     soup = BeautifulSoup(page.content, "html.parser")
 
-    title = soup.find("div", class_="pdt_v8")
-    if title:
-        title = title.get_text().strip()
+    title_tag = soup.find("h1")
+    if title_tag:
+        title = title_tag.get_text().strip()
     else:
         title = "Ürün Bulunamadı"
 
@@ -83,13 +83,13 @@ def trendyol_product_info(URL):
     page = requests.get(URL, headers=headers)
     soup = BeautifulSoup(page.content, "html.parser")
 
-    title = soup.find("h1", class_="zLHJIGKJ")
-    if title:
-        title = title.get_text().strip()
+    title_tag = soup.find("h1", class_="zLHJIGKJ")
+    if title_tag:
+        title = title_tag.get_text().strip()
     else:
         title = "Ürün Bulunamadı"
 
-    price_tag = soup.find("span", class_="FteoagkF")
+    price_tag = soup.find("div", class_="IZf80jOe")
     if price_tag:
         price_text = price_tag.get_text()
         price_text = price_text.split(",")[0]
