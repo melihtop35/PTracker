@@ -35,7 +35,7 @@ def amazon_product_info(URL):
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return "Ürün bulunamadı","İlan silinmiş olabilir"
+    return "Ürün bulunamadı", "İlan silinmiş olabilir"
 
 
 def akakce_product_info(URL):
@@ -68,7 +68,7 @@ def akakce_product_info(URL):
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return "Ürün bulunamadı","İlan silinmiş olabilir"
+    return "Ürün bulunamadı", "İlan silinmiş olabilir"
 
 
 def hepsiburada_product_info(URL):
@@ -103,7 +103,7 @@ def hepsiburada_product_info(URL):
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return "Ürün bulunamadı","İlan silinmiş olabilir"
+    return "Ürün bulunamadı", "İlan silinmiş olabilir"
 
 
 def trendyol_product_info(URL):
@@ -136,7 +136,7 @@ def trendyol_product_info(URL):
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return "Ürün bulunamadı","İlan silinmiş olabilir"
+    return "Ürün bulunamadı", "İlan silinmiş olabilir"
 
 
 def letgo_product_info(URL):
@@ -169,10 +169,10 @@ def letgo_product_info(URL):
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return "Ürün bulunamadı","İlan silinmiş olabilir"
+    return "Ürün bulunamadı", "İlan silinmiş olabilir"
 
 
-def check_prices(products):
+def check_prices_and_send(products):
     email_body = ""
     current_prices = {}
     for product in products:

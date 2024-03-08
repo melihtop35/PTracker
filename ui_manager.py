@@ -1,5 +1,5 @@
 import tkinter as tk
-import json
+import json, pystray, PIL.Image
 from tkinter import messagebox
 from datetime import datetime
 from product_manager import (
@@ -7,7 +7,7 @@ from product_manager import (
     save_products_to_json,
     update_products,
 )
-from price_checker import check_prices
+from price_checker import check_prices_and_send
 from email_manager import add_email
 from price_checker import (
     amazon_product_info,
@@ -16,6 +16,8 @@ from price_checker import (
     trendyol_product_info,
     hepsiburada_product_info,
 )
+
+image = PIL.Image.open("form.ico")
 
 
 def open_add_product_window(products):
@@ -264,6 +266,34 @@ def main():
     root.title("Fiyat Kontrol Programı")
     root.geometry("+300+300")
 
+    def show_icon():
+        def on_clicked(icon, item):
+            if str(item) == "Göster":
+                root.deiconify()  # Ana pencereyi yeniden göster
+                root.lift()  # Pencereyi en üste getir
+                root.focus_force()  # Pencereye odaklan
+                icon.stop()
+            elif str(item) == "Çık":
+                icon.stop()
+                root.destroy()  # Programı kapat
+
+        # Pencereyi gizle
+        root.withdraw()
+
+        # Simge çubuğuna simge ekleme
+        icon = pystray.Icon(
+            "Neural",
+            image,
+            "Fiyat Takibi",
+            menu=pystray.Menu(
+                pystray.MenuItem("Göster", on_clicked),
+                pystray.MenuItem("Çık", on_clicked),
+            ),
+        )
+        icon.run()
+
+    root.wm_protocol("WM_DELETE_WINDOW", show_icon)
+
     # Buton oluşturma
     button_font = ("Arial", 10)
     button_width = 20
@@ -290,7 +320,7 @@ def main():
     check_button = tk.Button(
         root,
         text="Ürün Kontrolü Yap",
-        command=lambda: check_prices(products),
+        command=lambda: check_prices_and_send(products),
         font=button_font,
         width=button_width,
     )
@@ -327,5 +357,6 @@ def main():
 
 # Uygulamayı yeniden başlatma
 def restart_app():
+    root.deiconify()  # Tkinter penceresini yeniden göster
     root.destroy()
     main()
