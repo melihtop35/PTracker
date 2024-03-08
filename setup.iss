@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Fiyat Takipçi"
-#define MyAppVersion "1.0"
+#define MyAppVersion "1.1"
 #define MyAppPublisher "MG&AStudio, Inc."
 #define MyAppExeName "main.exe"
 #define MyAppAssocName MyAppName + " File"
@@ -39,11 +39,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "C:\Users\melih\OneDrive\Belgeler\Visual Studio Code\PTracker\dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\melih\OneDrive\Belgeler\Visual Studio Code\PTracker\dist\email.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\melih\OneDrive\Belgeler\Visual Studio Code\PTracker\dist\form.ico"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\melih\OneDrive\Belgeler\Visual Studio Code\PTracker\dist\newProducts.json"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\melih\OneDrive\Belgeler\Visual Studio Code\PTracker\dist\products.json"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\melih\OneDrive\Belgeler\Visual Studio Code\PTracker\dist\readme.txt"; DestDir: "{app}"; Flags: ignoreversion
+
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]

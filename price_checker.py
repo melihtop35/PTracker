@@ -2,13 +2,14 @@ import json
 import requests
 from bs4 import BeautifulSoup
 import email_manager as email_manager
-import time,random
+import time, random
+
 
 def amazon_product_info(URL):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.1"
     }
-    
+
     # Farklı parser'ları sırayla deneyelim
     parsers = ["html.parser", "lxml", "html5lib"]
     for parser in parsers:
@@ -19,28 +20,29 @@ def amazon_product_info(URL):
             title = soup.find("span", id="productTitle")
             if title:
                 title = title.get_text().strip()
-            
+
             price_tag = soup.find("span", class_="a-price-whole")
             if price_tag:
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
                 price = float(price_text.replace("TL", "").replace(".", "").strip())
-            
+
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
-            time.sleep(random.uniform(1, 2))
+            time.sleep(random.uniform(0.25, 1))
 
             return title, price
         except Exception as e:
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return None, None
+    return "Ürün bulunamadı","İlan silinmiş olabilir"
+
 
 def akakce_product_info(URL):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.1"
     }
-    
+
     # Farklı parser'ları sırayla deneyelim
     parsers = ["html.parser", "lxml", "html5lib"]
     for parser in parsers:
@@ -57,22 +59,23 @@ def akakce_product_info(URL):
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
                 price = float(price_text.replace("TL", "").replace(".", "").strip())
-            
+
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
-            time.sleep(random.uniform(1, 2))
+            time.sleep(random.uniform(0.25, 1))
 
             return title, price
         except Exception as e:
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return None, None
+    return "Ürün bulunamadı","İlan silinmiş olabilir"
+
 
 def hepsiburada_product_info(URL):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.1"
     }
-    
+
     # Farklı parser'ları sırayla deneyelim
     parsers = ["html.parser", "lxml", "html5lib"]
     for parser in parsers:
@@ -84,27 +87,30 @@ def hepsiburada_product_info(URL):
             if title_tag:
                 title = title_tag.get_text().strip()
 
-            price_tag = soup.find("span", {"data-bind": "markupText:'currentPriceBeforePoint'"})
+            price_tag = soup.find(
+                "span", {"data-bind": "markupText:'currentPriceBeforePoint'"}
+            )
             if price_tag:
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
                 price = float(price_text.strip())
-            
+
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
-            time.sleep(random.uniform(1, 2))
+            time.sleep(random.uniform(0.25, 1))
 
             return title, price
         except Exception as e:
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return None, None
+    return "Ürün bulunamadı","İlan silinmiş olabilir"
+
 
 def trendyol_product_info(URL):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.1"
     }
-    
+
     # Farklı parser'ları sırayla deneyelim
     parsers = ["html.parser", "lxml", "html5lib"]
     for parser in parsers:
@@ -112,31 +118,32 @@ def trendyol_product_info(URL):
             page = requests.get(URL, headers=headers)
             soup = BeautifulSoup(page.content, parser)
 
-            title_tag = soup.find("h1", class_="zLHJIGKJ")
+            title_tag = soup.find("h1", class_="pr-new-br")
             if title_tag:
                 title = title_tag.get_text().strip()
 
-            price_tag = soup.find("div", class_="IZf80jOe")
+            price_tag = soup.find("div", class_="product-price-container")
             if price_tag:
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
                 price = float(price_text.replace("TL", "").replace(".", "").strip())
-            
+
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
-            time.sleep(random.uniform(1, 2))
+            time.sleep(random.uniform(0.25, 1))
 
             return title, price
         except Exception as e:
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return None, None
+    return "Ürün bulunamadı","İlan silinmiş olabilir"
+
 
 def letgo_product_info(URL):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.1"
     }
-    
+
     # Farklı parser'ları sırayla deneyelim
     parsers = ["html.parser", "lxml", "html5lib"]
     for parser in parsers:
@@ -153,16 +160,17 @@ def letgo_product_info(URL):
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
                 price = float(price_text.replace("TL", "").replace(".", "").strip())
-            
+
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
-            time.sleep(random.uniform(1, 2))
+            time.sleep(random.uniform(0.25, 1))
 
             return title, price
         except Exception as e:
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return None, None
+    return "Ürün bulunamadı","İlan silinmiş olabilir"
+
 
 def check_prices(products):
     email_body = ""
@@ -183,7 +191,7 @@ def check_prices(products):
         elif "letgo" in URL:
             title, price = letgo_product_info(URL)
         else:
-            title, price = "Bilinmeyen Ürün", 0
+            title, price = "Bilinemeyen Ürün", "Bilinemeyen Fiyat"
 
         current_prices[title] = price
 
@@ -200,6 +208,7 @@ def check_prices(products):
 
     with open("newProducts.json", "w") as file:
         json.dump(current_prices, file, indent=4)
+
 
 try:
     with open("newProducts.json", "r") as file:
