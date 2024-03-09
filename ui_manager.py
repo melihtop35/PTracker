@@ -1,5 +1,5 @@
 import tkinter as tk
-import json, pystray, PIL.Image
+import json, pystray, PIL.Image, time, threading
 from tkinter import messagebox
 from datetime import datetime
 from product_manager import (
@@ -292,7 +292,17 @@ def main():
         )
         icon.run()
 
-    root.wm_protocol("WM_DELETE_WINDOW", show_icon)
+    def minimize_to_tray():
+        response = messagebox.askyesno(
+            "Simge Durumuna Küçültme",
+            "Uygulamayı simge durumuna küçültmek ister misiniz?",
+        )
+        if response:
+            show_icon()
+        else:
+            root.destroy()
+
+    root.wm_protocol("WM_DELETE_WINDOW", minimize_to_tray)
 
     # Buton oluşturma
     button_font = ("Arial", 10)
@@ -350,6 +360,16 @@ def main():
         width=button_width,
     )
     change_email_button.pack(pady=button_pad_y)
+
+    # `check_prices_and_send` işlevini 10 dakika geciktirerek başlatan bir thread oluştur
+    def check_prices_thread():
+        time.sleep(600)  # 10 dakika bekle
+        while True:
+            check_prices_and_send(products)
+
+    prices_thread = threading.Thread(target=check_prices_thread)
+    prices_thread.daemon = True  # Ana program sona erdiğinde bu thread sona ersin
+    prices_thread.start()
 
     # Pencereyi gösterme
     root.mainloop()

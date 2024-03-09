@@ -2,6 +2,7 @@ import json
 import smtplib
 from tkinter import messagebox, simpledialog
 
+
 def get_receiver_email():
     try:
         with open("email.json", "r") as file:
@@ -11,7 +12,7 @@ def get_receiver_email():
                 receiver_email = data.get("email")
             else:
                 # Veri bir liste veya başka bir tipse, varsayılan olarak None döndür
-                messagebox.showinfo("Hata", "Listi sikm")
+                messagebox.showinfo("Hata", "List formatında dosyalama")
     except FileNotFoundError:
         # Dosya bulunamazsa veya içeriği yüklenemezse, varsayılan olarak None döndür
         messagebox.showinfo("Hata", "E_Posta Boş!")
@@ -31,15 +32,17 @@ def send_mail(body):
     server.ehlo()
     server.starttls()
     server.ehlo()
-    server.login(sender_email, "piia zxxu wctr xczn")  # Gönderenin e-posta hesabının şifresi
+    server.login(
+        sender_email, "piia zxxu wctr xczn"
+    )  # Gönderenin e-posta hesabının şifresi
 
     subject = "Fiyat Düştü!"
     msg = f"From: {sender_name}\nSubject: {subject}\n\n{body}"
     msg = msg.encode("utf-8")
 
     server.sendmail(sender_email, receiver_email, msg)
-    messagebox.showinfo("Bilgilendirme", "E-Posta Gönderildi!")
     server.quit()
+
 
 def add_email():
     try:

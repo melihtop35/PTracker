@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import email_manager as email_manager
 import time, random
+from tkinter import messagebox
 
 
 def amazon_product_info(URL):
@@ -25,7 +26,7 @@ def amazon_product_info(URL):
             if price_tag:
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
-                price = float(price_text.replace("TL", "").replace(".", "").strip())
+                price = int(price_text.replace("TL", "").replace(".", "").strip())
 
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
             time.sleep(random.uniform(0.25, 1))
@@ -35,7 +36,7 @@ def amazon_product_info(URL):
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return "Ürün bulunamadı", "İlan silinmiş olabilir"
+    return "Ürün bulunamadı", None
 
 
 def akakce_product_info(URL):
@@ -58,7 +59,7 @@ def akakce_product_info(URL):
             if price_tag:
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
-                price = float(price_text.replace("TL", "").replace(".", "").strip())
+                price = int(price_text.replace("TL", "").replace(".", "").strip())
 
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
             time.sleep(random.uniform(0.25, 1))
@@ -68,7 +69,7 @@ def akakce_product_info(URL):
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return "Ürün bulunamadı", "İlan silinmiş olabilir"
+    return "Ürün bulunamadı", None
 
 
 def hepsiburada_product_info(URL):
@@ -93,7 +94,7 @@ def hepsiburada_product_info(URL):
             if price_tag:
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
-                price = float(price_text.strip())
+                price = int(price_text.replace("TL", "").replace(".", "").strip())
 
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
             time.sleep(random.uniform(0.25, 1))
@@ -103,7 +104,7 @@ def hepsiburada_product_info(URL):
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return "Ürün bulunamadı", "İlan silinmiş olabilir"
+    return "Ürün bulunamadı", None
 
 
 def trendyol_product_info(URL):
@@ -126,7 +127,7 @@ def trendyol_product_info(URL):
             if price_tag:
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
-                price = float(price_text.replace("TL", "").replace(".", "").strip())
+                price = int(price_text.replace("TL", "").replace(".", "").strip())
 
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
             time.sleep(random.uniform(0.25, 1))
@@ -136,7 +137,7 @@ def trendyol_product_info(URL):
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return "Ürün bulunamadı", "İlan silinmiş olabilir"
+    return "Ürün bulunamadı", None
 
 
 def letgo_product_info(URL):
@@ -159,7 +160,7 @@ def letgo_product_info(URL):
             if price_tag:
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
-                price = float(price_text.replace("TL", "").replace(".", "").strip())
+                price = int(price_text.replace("TL", "").replace(".", "").strip())
 
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
             time.sleep(random.uniform(0.25, 1))
@@ -169,7 +170,7 @@ def letgo_product_info(URL):
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return "Ürün bulunamadı", "İlan silinmiş olabilir"
+    return "Ürün bulunamadı", None
 
 
 def check_prices_and_send(products):
@@ -191,13 +192,13 @@ def check_prices_and_send(products):
         elif "letgo" in URL:
             title, price = letgo_product_info(URL)
         else:
-            title, price = "Bilinemeyen Ürün", "Bilinemeyen Fiyat"
+            title, price = "Bilinemeyen Ürün", 0
 
         current_prices[title] = price
 
-        if price is not None and target_price and price <= float(target_price):
+        if price is not None and target_price and price <= int(target_price):
             # Hedef fiyatın altında olduğu bilgisini ekleyelim
-            price_difference = float(target_price) - price
+            price_difference = int(target_price) - price
             email_body += (
                 f"{title} Şimdi {price}₺ ({target_price}₺'nin %.2f TL altında)\nLinki Kontrol Et: {URL}\n\n"
                 % price_difference
