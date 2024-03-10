@@ -3,7 +3,18 @@ import requests
 from bs4 import BeautifulSoup
 import email_manager as email_manager
 import time, random
-from tkinter import messagebox
+
+
+def add_one_if_last_digit_is_nine(number):
+    # Sayının son basamağını al
+    last_digit = int(str(number)[-1])
+
+    # Son basamak 9 ise
+    if last_digit == 9:
+        # Sayıya 1 ekle
+        number += 1
+
+    return number
 
 
 def amazon_product_info(URL):
@@ -27,6 +38,7 @@ def amazon_product_info(URL):
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
                 price = int(price_text.replace("TL", "").replace(".", "").strip())
+                price = add_one_if_last_digit_is_nine(price)
 
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
             time.sleep(random.uniform(0.25, 1))
@@ -60,6 +72,7 @@ def akakce_product_info(URL):
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
                 price = int(price_text.replace("TL", "").replace(".", "").strip())
+                price = add_one_if_last_digit_is_nine(price)
 
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
             time.sleep(random.uniform(0.25, 1))
@@ -95,6 +108,7 @@ def hepsiburada_product_info(URL):
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
                 price = int(price_text.replace("TL", "").replace(".", "").strip())
+                price = add_one_if_last_digit_is_nine(price)
 
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
             time.sleep(random.uniform(0.25, 1))
@@ -128,6 +142,7 @@ def trendyol_product_info(URL):
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
                 price = int(price_text.replace("TL", "").replace(".", "").strip())
+                price = add_one_if_last_digit_is_nine(price)
 
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
             time.sleep(random.uniform(0.25, 1))
@@ -161,6 +176,7 @@ def letgo_product_info(URL):
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
                 price = int(price_text.replace("TL", "").replace(".", "").strip())
+                price = add_one_if_last_digit_is_nine(price)
 
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
             time.sleep(random.uniform(0.25, 1))

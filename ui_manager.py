@@ -259,7 +259,100 @@ def show_saved_products(root):
         time_label.pack(pady=10)
 
 
+def save_settings_to_json(settings):
+    with open("settings.json", "w") as file:
+        json.dump(settings, file, indent=4)
+
+
+def load_settings_from_json():
+    try:
+        with open("settings.json", "r") as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return {"minimize_to_tray": False, "button_text": "600"}  # Varsayılan ayarlar
+
+
+global settings
+
+
+def open_settings():
+    btn_height = 1
+    btn_width = 10
+
+    def toggle_minimize_to_tray():
+        settings["minimize_to_tray"] = not settings["minimize_to_tray"]
+        save_settings_to_json(settings)
+        if settings["minimize_to_tray"]:
+            toggle_button_minimize.config(text="Açık")
+        else:
+            toggle_button_minimize.config(text="Kapalı")
+
+    def update_button_text():
+        current_text = settings["button_text"]
+        current_number = int(current_text)
+        next_number = 0
+        if current_number == 600:
+            next_number = 1200
+        elif current_number == 1200:
+            next_number = 3600
+        elif current_number == 3600:
+            next_number = 600
+
+        toggle_button_timer.config(text=str(int(next_number / 60)) + " Dakika")
+        # JSON dosyasına kaydet
+        settings["button_text"] = str(next_number)
+        save_settings_to_json(settings)
+
+    # Ayarları yükle
+    settings = load_settings_from_json()
+
+    # Ayarlar penceresini aç
+    settings_window = tk.Toplevel(root)
+    settings_window.title("Ayarlar")
+    settings_window.geometry("400x200+500+300")
+
+    # Minimize to tray ayarı için bir label oluştur
+    toggle_label_minimize = tk.Label(
+        settings_window,
+        text="Pencereyi simge durumuna küçült",
+        font=("Arial", 12),
+    )
+    toggle_label_minimize.grid(row=0, column=0, sticky="w", padx=10, pady=5)
+
+    # Minimize to tray ayarı için bir buton oluştur
+    toggle_button_minimize = tk.Button(
+        settings_window,
+        text="Açık" if settings["minimize_to_tray"] else "Kapalı",
+        command=toggle_minimize_to_tray,
+        font=("Arial", 12),
+        width=btn_width,
+        height=btn_height,
+    )
+    toggle_button_minimize.grid(row=0, column=1, padx=10, pady=5)
+
+    # Uygulama otomatik çalışma zamanı için bir label oluştur
+    toggle_label_timer = tk.Label(
+        settings_window,
+        text="Uygulama otomatik çalışma zamanı",
+        font=("Arial", 12),
+    )
+    toggle_label_timer.grid(row=1, column=0, sticky="w", padx=10, pady=5)
+
+    # Uygulama otomatik çalışma zamanı için bir buton oluştur
+    toggle_button_timer = tk.Button(
+        settings_window,
+        text=settings["button_text"],
+        command=update_button_text,
+        font=("Arial", 12),
+        width=btn_width,
+        height=btn_height,
+    )
+    toggle_button_timer.grid(row=1, column=1, padx=10, pady=5)
+
+
 def main():
+    # Ayarları yükle
+    settings = load_settings_from_json()
     global root
     root = tk.Tk()
     root.configure(bg="lightgray")
@@ -293,11 +386,8 @@ def main():
         icon.run()
 
     def minimize_to_tray():
-        response = messagebox.askyesno(
-            "Simge Durumuna Küçültme",
-            "Uygulamayı simge durumuna küçültmek ister misiniz?",
-        )
-        if response:
+        settings = load_settings_from_json()
+        if settings["minimize_to_tray"]:
             show_icon()
         else:
             root.destroy()
@@ -308,6 +398,19 @@ def main():
     button_font = ("Arial", 10)
     button_width = 20
     button_pad_y = 5
+
+    # İkon görüntüsünü yükleyin (yerine kendi ikonunuzun yolunu verin)
+    settings_icon = tk.PhotoImage(file="settings.ico")
+    # Ayarlar butonunu oluşturma
+    settings_button = tk.Button(
+        root,
+        image=settings_icon,  # İkonu belirle
+        command=open_settings,
+        bd=0,  # Kenarlık kalınlığını sıfıra ayarla
+        bg="lightgray",  # Arka plan rengini ayarla
+        activebackground="lightgray",  # Tıklanma durumunda arka plan rengini ayarla
+    )
+    settings_button.place(relx=1.0, rely=0.0, anchor="ne")
 
     add_product_button = tk.Button(
         root,
@@ -361,9 +464,9 @@ def main():
     )
     change_email_button.pack(pady=button_pad_y)
 
-    # `check_prices_and_send` işlevini 10 dakika geciktirerek başlatan bir thread oluştur
+    # `check_prices_and_send` işlevini 10,20,60 dakika geciktirerek başlatan bir thread oluştur
     def check_prices_thread():
-        time.sleep(600)  # 10 dakika bekle
+        time.sleep(int(settings["button_text"]))  # 10,20,60 dakika bekle
         while True:
             check_prices_and_send(products)
 
