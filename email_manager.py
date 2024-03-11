@@ -1,6 +1,7 @@
 import json
 import smtplib
 from tkinter import messagebox, simpledialog
+from settings import load_settings_from_json, get_language_data
 
 
 def get_receiver_email():
@@ -12,10 +13,14 @@ def get_receiver_email():
                 receiver_email = data.get("email")
             else:
                 # Veri bir liste veya başka bir tipse, varsayılan olarak None döndür
-                messagebox.showinfo("Hata", "List formatında dosyalama")
+                messagebox.showinfo(
+                    get_language_data("error"), get_language_data("format_error")
+                )
     except FileNotFoundError:
         # Dosya bulunamazsa veya içeriği yüklenemezse, varsayılan olarak None döndür
-        messagebox.showinfo("Hata", "E_Posta Boş!")
+        messagebox.showinfo(
+            get_language_data("error"), get_language_data("empty_email")
+        )
 
     return receiver_email
 
@@ -36,7 +41,7 @@ def send_mail(body):
         sender_email, "piia zxxu wctr xczn"
     )  # Gönderenin e-posta hesabının şifresi
 
-    subject = "Fiyat Düştü!"
+    subject = get_language_data("subject")
     msg = f"From: {sender_name}\nSubject: {subject}\n\n{body}"
     msg = msg.encode("utf-8")
 
@@ -52,29 +57,41 @@ def add_email():
                 # E-posta adresi zaten var, değiştirmek için iste
                 current_email = data["email"]
                 change_email = messagebox.askyesno(
-                    "E-Posta Değiştir",
-                    f"Mevcut E-Posta Adresiniz: {current_email}\nE-posta adresinizi değiştirmek ister misiniz?",
+                    get_language_data("change_email"),
+                    get_language_data("mbox_message_first")
+                    + current_email
+                    + get_language_data("mbox_message_second"),
                 )
                 if change_email:
                     new_email = simpledialog.askstring(
-                        "E-Posta Değiştir", "Yeni E-Posta Adresi:"
+                        get_language_data("change_email"),
+                        get_language_data("new_email"),
                     )
                     if new_email:
                         data["email"] = new_email
                         with open("email.json", "w") as file:
                             json.dump(data, file)
-                        messagebox.showinfo("Bilgi", "E-Posta başarıyla değiştirildi.")
+                        messagebox.showinfo(
+                            get_language_data("mbox_info_success1"),
+                            get_language_data("mbox_info_message"),
+                        )
             else:
                 # email.json dosyası var ama içinde e-posta yok, e-posta ekle
-                new_email = simpledialog.askstring("E-Posta Ekle", "E-Posta Adresi:")
+                new_email = simpledialog.askstring(
+                    get_language_data("simple_dialog_askstring1"),
+                    get_language_data("simple_dialog_askstring2"),
+                )
                 if new_email:
                     with open("email.json", "w") as file:
                         json.dump({"email": new_email}, file)
-                    messagebox.showinfo("Bilgi", "E-Posta başarıyla eklendi.")
+                    messagebox.showinfo(
+                        get_language_data("mbox_info_success1"),
+                        get_language_data("mbox_info_success2"),
+                    )
     except FileNotFoundError:
         # email.json dosyası yok, e-posta eklemek için oluştur
-        new_email = simpledialog.askstring("E-Posta Ekle", "E-Posta Adresi:")
+        new_email = simpledialog.askstring(get_language_data("simple_dialog_askstring"))
         if new_email:
             with open("email.json", "w") as file:
                 json.dump({"email": new_email}, file)
-            messagebox.showinfo("Bilgi", "E-Posta başarıyla eklendi.")
+            messagebox.showinfo(get_language_data("mbox_info_success"))

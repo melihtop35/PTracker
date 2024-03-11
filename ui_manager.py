@@ -6,12 +6,12 @@ import time
 import threading
 from tkinter import messagebox
 from datetime import datetime
+from settings import save_settings_to_json, load_settings_from_json, get_language_data
 from product_manager import (
     load_products_from_json,
     save_products_to_json,
     update_products,
 )
-from price_checker import check_prices_and_send
 from email_manager import add_email
 from price_checker import (
     amazon_product_info,
@@ -19,6 +19,7 @@ from price_checker import (
     akakce_product_info,
     trendyol_product_info,
     hepsiburada_product_info,
+    check_prices_and_send,
 )
 
 image = PIL.Image.open("form.ico")
@@ -61,31 +62,34 @@ def open_add_product_window(products):
 
 
 def add_product_and_close(window, products):
-    try:
-        link = link_entry.get()
-        name = name_entry.get()
-        target_price = float(target_price_entry.get())
-    except ValueError:
-        messagebox.showinfo(
-            get_language_data("error"), get_language_data("valid_price_error")
-        )
-        return
-    if link and name and target_price:
+    link = link_entry.get()
+    name = name_entry.get()
+    target_price = target_price_entry.get()
+    if not link and not name and not target_price:
+        messagebox.showerror(get_language_data("error"), get_language_data("fill_all"))
+    elif link and name and target_price:
+        try:
+            target_price = float(target_price)
+        except ValueError:
+            messagebox.showerror(
+                get_language_data("error"), get_language_data("valid_price_error")
+            )
+            return
         products.append({"name": name, "URL": link, "target_price": target_price})
         save_products_to_json("products.json", products)
         messagebox.showinfo(
             get_language_data("info"), get_language_data("product_added_info")
         )
         window.destroy()
-    elif not link and name and target_price:
+    elif not link:
         messagebox.showerror(
             get_language_data("error"), get_language_data("link_error")
         )
-    elif link and not name and target_price:
+    elif not name:
         messagebox.showerror(
             get_language_data("error"), get_language_data("name_error")
         )
-    elif link and name and not target_price:
+    elif not target_price:
         messagebox.showerror(
             get_language_data("error"), get_language_data("price_error")
         )
@@ -105,7 +109,7 @@ def open_edit_products_window(products):
 
     edit_products_window = tk.Toplevel()
     edit_products_window.title(get_language_data("edit_products_window_title"))
-    edit_products_window.geometry("900x400+400+300")
+    edit_products_window.geometry("940x400+400+300")
 
     scroll_frame = tk.Frame(edit_products_window)
     scroll_frame.pack(fill="both", expand=True)
@@ -254,20 +258,9 @@ def show_saved_products(root):
         time_label.pack(pady=10)
 
 
-def save_settings_to_json(settings):
-    with open("settings.json", "w", encoding="utf-8") as file:
-        json.dump(settings, file, indent=4)
-
-
-def load_settings_from_json():
-    try:
-        with open("settings.json", "r", encoding="utf-8") as file:
-            return json.load(file)
-    except FileNotFoundError:
-        return {"minimize_to_tray": False, "button_text": "600"}
-
-
 def open_settings():
+    settings = load_settings_from_json()
+
     def toggle_minimize_to_tray():
         settings["minimize_to_tray"] = not settings["minimize_to_tray"]
         save_settings_to_json(settings)
@@ -287,7 +280,9 @@ def open_settings():
         elif current_number == 3600:
             next_number = 600
 
-        toggle_button_timer.config(text=str(int(next_number / 60)))
+        toggle_button_timer.config(
+            text=str(int(next_number / 60)) + " " + get_language_data("minutes_text")
+        )
         settings["button_text"] = str(next_number)
         save_settings_to_json(settings)
 
@@ -320,8 +315,8 @@ def open_settings():
                 + " "
                 + lang_texts["minutes_text"]
             )
+            toggle_label_lang.config(text=lang_texts["language_label"])
 
-    settings = load_settings_from_json()
     settings_window = tk.Toplevel(root)
     settings_window.geometry("330x150+500+300")
 
@@ -351,7 +346,8 @@ def open_settings():
 
     toggle_button_timer = tk.Button(
         settings_window,
-        text=str(int(int(settings["button_text"]) / 60)),
+        text=str(int(int(settings["button_text"]) / 60))
+        + get_language_data("minutes_text"),
         command=update_button_text,
         font=("Arial", 12),
         width=10,
@@ -373,22 +369,14 @@ def open_settings():
     )
     language_menu.grid(row=2, columnspan=2, pady=10)
 
-    update_language(settings["language"])
-
     settings_window.wm_protocol("WM_DELETE_WINDOW", restart_app)
 
-
-def get_language_data(key):
-    # settings["language"] değerine göre doğru dilin altındaki öğeleri döndür
-    return language_data[settings["language"]].get(key, "")
+    update_language(settings["language"])
 
 
 def main():
     global settings
-    global language_data
     products = load_products_from_json("products.json")
-    with open("language_data.json", "r", encoding="utf-8") as lang_file:
-        language_data = json.load(lang_file)
     settings = load_settings_from_json()
 
     global root
@@ -404,7 +392,7 @@ def main():
                 root.lift()
                 root.focus_force()
                 icon.stop()
-            elif str(item) == language_data("exit_text"):
+            elif str(item) == get_language_data("exit_text"):
                 icon.stop()
                 root.destroy()
 
