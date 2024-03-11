@@ -3,6 +3,19 @@ import requests
 from bs4 import BeautifulSoup
 import email_manager as email_manager
 import time, random
+from settings import get_language_data
+
+
+def add_one_if_last_digit_is_nine(number):
+    # Sayının son basamağını al
+    last_digit = int(str(number)[-1])
+
+    # Son basamak 9 ise
+    if last_digit == 9:
+        # Sayıya 1 ekle
+        number += 1
+
+    return number
 
 
 def amazon_product_info(URL):
@@ -25,7 +38,8 @@ def amazon_product_info(URL):
             if price_tag:
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
-                price = float(price_text.replace("TL", "").replace(".", "").strip())
+                price = int(price_text.replace("TL", "").replace(".", "").strip())
+                price = add_one_if_last_digit_is_nine(price)
 
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
             time.sleep(random.uniform(0.25, 1))
@@ -35,7 +49,7 @@ def amazon_product_info(URL):
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return "Ürün bulunamadı","İlan silinmiş olabilir"
+    return get_language_data("product_not_found"), None
 
 
 def akakce_product_info(URL):
@@ -58,7 +72,8 @@ def akakce_product_info(URL):
             if price_tag:
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
-                price = float(price_text.replace("TL", "").replace(".", "").strip())
+                price = int(price_text.replace("TL", "").replace(".", "").strip())
+                price = add_one_if_last_digit_is_nine(price)
 
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
             time.sleep(random.uniform(0.25, 1))
@@ -68,7 +83,7 @@ def akakce_product_info(URL):
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return "Ürün bulunamadı","İlan silinmiş olabilir"
+    return get_language_data("product_not_found"), None
 
 
 def hepsiburada_product_info(URL):
@@ -93,7 +108,8 @@ def hepsiburada_product_info(URL):
             if price_tag:
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
-                price = float(price_text.strip())
+                price = int(price_text.replace("TL", "").replace(".", "").strip())
+                price = add_one_if_last_digit_is_nine(price)
 
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
             time.sleep(random.uniform(0.25, 1))
@@ -103,7 +119,7 @@ def hepsiburada_product_info(URL):
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return "Ürün bulunamadı","İlan silinmiş olabilir"
+    return get_language_data("product_not_found"), None
 
 
 def trendyol_product_info(URL):
@@ -126,7 +142,8 @@ def trendyol_product_info(URL):
             if price_tag:
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
-                price = float(price_text.replace("TL", "").replace(".", "").strip())
+                price = int(price_text.replace("TL", "").replace(".", "").strip())
+                price = add_one_if_last_digit_is_nine(price)
 
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
             time.sleep(random.uniform(0.25, 1))
@@ -136,7 +153,7 @@ def trendyol_product_info(URL):
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return "Ürün bulunamadı","İlan silinmiş olabilir"
+    return get_language_data("product_not_found"), None
 
 
 def letgo_product_info(URL):
@@ -159,7 +176,8 @@ def letgo_product_info(URL):
             if price_tag:
                 price_text = price_tag.get_text()
                 price_text = price_text.split(",")[0]
-                price = float(price_text.replace("TL", "").replace(".", "").strip())
+                price = int(price_text.replace("TL", "").replace(".", "").strip())
+                price = add_one_if_last_digit_is_nine(price)
 
             # 1 veya 2 saniye arası rastgele bir gecikme ekle
             time.sleep(random.uniform(0.25, 1))
@@ -169,10 +187,10 @@ def letgo_product_info(URL):
             print(f"Parser {parser} ile çekme sırasında hata: {e}")
 
     # Tüm parser'lar denenip başarısız olursa None döndür
-    return "Ürün bulunamadı","İlan silinmiş olabilir"
+    return get_language_data("product_not_found"), None
 
 
-def check_prices(products):
+def check_prices_and_send(products):
     email_body = ""
     current_prices = {}
     for product in products:
@@ -191,16 +209,15 @@ def check_prices(products):
         elif "letgo" in URL:
             title, price = letgo_product_info(URL)
         else:
-            title, price = "Bilinemeyen Ürün", "Bilinemeyen Fiyat"
+            title, price = get_language_data("unkown_product"), 0
 
         current_prices[title] = price
 
-        if price is not None and target_price and price <= float(target_price):
+        if price is not None and target_price and price <= int(target_price):
             # Hedef fiyatın altında olduğu bilgisini ekleyelim
-            price_difference = float(target_price) - price
-            email_body += (
-                f"{title} Şimdi {price}₺ ({target_price}₺'nin %.2f TL altında)\nLinki Kontrol Et: {URL}\n\n"
-                % price_difference
+            price_difference = int(target_price) - price
+            email_body += get_language_data("email_content").format(
+                title, price, target_price, price_difference, URL
             )
 
     if email_body:

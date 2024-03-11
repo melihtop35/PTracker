@@ -2,26 +2,26 @@
     {
         "name": "Laptop Hepsiburada",
         "URL": "https://www.hepsiburada.com/asus-vivobook-15-x1502za-ej1644-intel-core-i5-1235u-8gb-256gb-ssd-freedos-15-6-fhd-tasinabilir-bilgisayar-p-HBCV000050QPKK?magaza=Hepsiburada",
-        "target_price": 15000.0
+        "target_price": 10000.0
     },
     {
         "name": "Laptop Trendyol",
         "URL": "https://www.trendyol.com/lenovo/ideapad1-celeron-n4120-4gb-ram-128gb-15-6-windows-11-tasinabilir-bilgisayar-82v7005mtx-p-743393924?boutiqueId=61&merchantId=125175&storefrontId=1&countryCode=TR&language=tr&gads=true&srsltid=AfmBOoo6t-Pw1DMMv1J907ZYMp7pHz_4cRnlNFDU-i0Bkbbq7gVGWggUkH4",
-        "target_price": 14000.0
+        "target_price": 10000.0
     },
     {
         "name": "RTX 2060 Super",
         "URL": "https://www.letgo.com/item/rtx-2060-super-ekran-karti-iid-1635603332",
-        "target_price": 6500.0
+        "target_price": 10000.0
     },
     {
         "name": "AMD Ryzen 5 5600",
         "URL": "https://www.akakce.com/islemci/en-ucuz-amd-ryzen-5-5600-alti-cekirdek-3-50-ghz-fiyati,1782415463.html",
-        "target_price": 3500.0
+        "target_price": 10000.0
     },
     {
         "name": "RTX 3060",
         "URL": "https://www.letgo.com/item/rtx-3060-zotac-iid-1675008306",
-        "target_price": 6500.0
+        "target_price": 10000.0
     }
 ]
