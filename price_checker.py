@@ -223,13 +223,13 @@ def check_prices_and_send(products):
     if email_body:
         email_manager.send_mail(email_body)
 
-    with open("newProducts.json", "w") as file:
+    with open("jsons/newProducts.json", "w") as file:
         json.dump(current_prices, file, indent=4)
 
 
 try:
-    with open("newProducts.json", "r") as file:
+    with open("jsons/newProducts.json", "r") as file:
         pass  # Dosya zaten var, bu yüzden bir şey yapmamıza gerek yok
 except FileNotFoundError:
-    with open("newProducts.json", "w") as file:
+    with open("jsons/newProducts.json", "w") as file:
         json.dump({}, file)

@@ -22,7 +22,7 @@ from price_checker import (
     check_prices_and_send,
 )
 
-image = PIL.Image.open("form.ico")
+image = PIL.Image.open("icons/form.ico")
 
 
 def open_add_product_window(products):
@@ -76,7 +76,7 @@ def add_product_and_close(window, products):
             )
             return
         products.append({"name": name, "URL": link, "target_price": target_price})
-        save_products_to_json("products.json", products)
+        save_products_to_json("jsons/products.json", products)
         messagebox.showinfo(
             get_language_data("info"), get_language_data("product_added_info")
         )
@@ -99,7 +99,7 @@ def add_product_and_close(window, products):
 def open_edit_products_window(products):
     def delete_product(index):
         del products[index]
-        save_products_to_json("products.json", products)
+        save_products_to_json("jsons/products.json", products)
         edit_products_window.destroy()
         open_edit_products_window(products)
 
@@ -211,14 +211,14 @@ def show_current_prices(products):
         tk.Frame(current_prices_window, height=1, bg="black").pack(fill="x")
 
     current_prices["saved_time"] = datetime.now().strftime("%d-%m-%y %H:%M:%S")
-    with open("newProducts.json", "w", encoding="utf-8") as file:
+    with open("jsons/newProducts.json", "w", encoding="utf-8") as file:
         json.dump(current_prices, file, indent=4)
 
     try:
-        with open("newProducts.json", "r", encoding="utf-8") as file:
+        with open("jsons/newProducts.json", "r", encoding="utf-8") as file:
             pass
     except FileNotFoundError:
-        with open("newProducts.json", "w", encoding="utf-8") as file:
+        with open("jsons/newProducts.json", "w", encoding="utf-8") as file:
             json.dump({}, file)
 
     current_prices_window.protocol("WM_DELETE_WINDOW", restart_app)
@@ -229,7 +229,7 @@ def show_saved_products(root):
     saved_prices_frame.pack(pady=10)
 
     try:
-        with open("newProducts.json", "r", encoding="utf-8") as file:
+        with open("jsons/newProducts.json", "r", encoding="utf-8") as file:
             saved_data = json.load(file)
             if isinstance(saved_data, dict):
                 current_prices = saved_data
@@ -297,7 +297,7 @@ def open_settings():
             update_language(settings["language"])
 
     def update_language(language):
-        with open("language_data.json", "r", encoding="utf-8") as lang_file:
+        with open("jsons/language_data.json", "r", encoding="utf-8") as lang_file:
             lang_data = json.load(lang_file)
             lang_texts = lang_data.get(language)
             settings_window.title(lang_texts["settings_window_title"])
@@ -376,7 +376,7 @@ def open_settings():
 
 def main():
     global settings
-    products = load_products_from_json("products.json")
+    products = load_products_from_json("jsons/products.json")
     settings = load_settings_from_json()
 
     global root
@@ -418,7 +418,7 @@ def main():
 
     root.wm_protocol("WM_DELETE_WINDOW", minimize_to_tray)
 
-    settings_icon = tk.PhotoImage(file="settings.ico")
+    settings_icon = tk.PhotoImage(file="icons/settings.ico")
     settings_button = tk.Button(
         root,
         image=settings_icon,
