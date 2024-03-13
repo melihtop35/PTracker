@@ -90,7 +90,10 @@ def add_email():
                     )
     except FileNotFoundError:
         # email.json dosyası yok, e-posta eklemek için oluştur
-        new_email = simpledialog.askstring(get_language_data("simple_dialog_askstring"))
+        new_email = simpledialog.askstring(
+            get_language_data("simple_dialog_askstring1"),
+            get_language_data("simple_dialog_askstring2"),
+        )
         if new_email:
             with open("jsons/email.json", "w") as file:
                 json.dump({"email": new_email}, file)

@@ -20,6 +20,7 @@ from price_checker import (
     trendyol_product_info,
     hepsiburada_product_info,
     check_prices_and_send,
+    check_prices_and_send_current,
 )
 
 image = PIL.Image.open("icons/form.ico")
@@ -186,7 +187,7 @@ def show_current_prices(products):
     current_prices_window.title(get_language_data("current_prices_window_title"))
     current_prices_window.geometry("+300+300")
 
-    current_prices = {}
+    current_prices = []
     for product in products:
         URL = product["URL"]
         if "amazon" in URL:
@@ -202,7 +203,7 @@ def show_current_prices(products):
         else:
             return
 
-        current_prices[title] = price
+        current_prices.append({"title": title, "URL": URL, "price": price})
 
         label_text = f"{title} - {price}₺"
         tk.Label(current_prices_window, text=label_text, font=("Arial", 10)).pack(
@@ -210,16 +211,14 @@ def show_current_prices(products):
         )
         tk.Frame(current_prices_window, height=1, bg="black").pack(fill="x")
 
-    current_prices["saved_time"] = datetime.now().strftime("%d-%m-%y %H:%M:%S")
+    saved_time = datetime.now().strftime("%d-%m-%y %H:%M:%S")
+    current_prices.append({"saved_time": saved_time})
+
+    # Önceki fiyatlarla karşılaştırma yap
+    check_prices_and_send_current(current_prices)
+
     with open("jsons/newProducts.json", "w", encoding="utf-8") as file:
         json.dump(current_prices, file, indent=4)
-
-    try:
-        with open("jsons/newProducts.json", "r", encoding="utf-8") as file:
-            pass
-    except FileNotFoundError:
-        with open("jsons/newProducts.json", "w", encoding="utf-8") as file:
-            json.dump({}, file)
 
     current_prices_window.protocol("WM_DELETE_WINDOW", restart_app)
 
@@ -231,31 +230,23 @@ def show_saved_products(root):
     try:
         with open("jsons/newProducts.json", "r", encoding="utf-8") as file:
             saved_data = json.load(file)
-            if isinstance(saved_data, dict):
-                current_prices = saved_data
-                saved_time = current_prices.get("saved_time")
-            else:
-                current_prices = saved_data[0]
-                saved_time = current_prices.get("saved_time")
     except FileNotFoundError:
-        current_prices = {}
-        saved_time = None
+        saved_data = []
 
-    for product, price in current_prices.items():
-        if product != "saved_time":
-            label_text = f"{product} - {price}₺"
+    for item in saved_data:
+        if "saved_time" not in item:
+            label_text = f"{item['title']} - {item['price']}₺"
             tk.Label(saved_prices_frame, text=label_text, font=("Arial", 10)).pack(
                 pady=5, padx=5
             )
             tk.Frame(saved_prices_frame, height=1, bg="black").pack(fill="x")
-
-    if saved_time:
-        time_label = tk.Label(
-            saved_prices_frame,
-            text=f"{get_language_data('saved_time_label')}: {saved_time}",
-            font=("Arial", 10),
-        )
-        time_label.pack(pady=10)
+        else:
+            time_label = tk.Label(
+                saved_prices_frame,
+                text=f"{get_language_data('saved_time_label')}: {item['saved_time']}",
+                font=("Arial", 10),
+            )
+            time_label.pack(pady=10)
 
 
 def open_settings():
