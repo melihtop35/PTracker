@@ -1,12 +1,12 @@
 import json
 import smtplib
 from tkinter import messagebox, simpledialog
-from settings import load_settings_from_json, get_language_data
+from settings import get_language_data
 
 
 def get_receiver_email():
     try:
-        with open("email.json", "r") as file:
+        with open("jsons/email.json", "r") as file:
             data = json.load(file)
             if isinstance(data, dict):
                 # Veri bir sözlükse, 'receiver_email' öğesini al
@@ -51,7 +51,7 @@ def send_mail(body):
 
 def add_email():
     try:
-        with open("email.json", "r") as file:
+        with open("jsons/email.json", "r") as file:
             data = json.load(file)
             if "email" in data:
                 # E-posta adresi zaten var, değiştirmek için iste
@@ -69,7 +69,7 @@ def add_email():
                     )
                     if new_email:
                         data["email"] = new_email
-                        with open("email.json", "w") as file:
+                        with open("jsons/email.json", "w") as file:
                             json.dump(data, file)
                         messagebox.showinfo(
                             get_language_data("mbox_info_success1"),
@@ -82,7 +82,7 @@ def add_email():
                     get_language_data("simple_dialog_askstring2"),
                 )
                 if new_email:
-                    with open("email.json", "w") as file:
+                    with open("jsons/email.json", "w") as file:
                         json.dump({"email": new_email}, file)
                     messagebox.showinfo(
                         get_language_data("mbox_info_success1"),
@@ -90,8 +90,11 @@ def add_email():
                     )
     except FileNotFoundError:
         # email.json dosyası yok, e-posta eklemek için oluştur
-        new_email = simpledialog.askstring(get_language_data("simple_dialog_askstring"))
+        new_email = simpledialog.askstring(
+            get_language_data("simple_dialog_askstring1"),
+            get_language_data("simple_dialog_askstring2"),
+        )
         if new_email:
-            with open("email.json", "w") as file:
+            with open("jsons/email.json", "w") as file:
                 json.dump({"email": new_email}, file)
             messagebox.showinfo(get_language_data("mbox_info_success"))

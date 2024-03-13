@@ -192,7 +192,7 @@ def letgo_product_info(URL):
 
 def check_prices_and_send(products):
     email_body = ""
-    current_prices = {}
+    current_prices = []
     for product in products:
         URL = product["URL"]
         target_price = product["target_price"]
@@ -211,7 +211,7 @@ def check_prices_and_send(products):
         else:
             title, price = get_language_data("unkown_product"), 0
 
-        current_prices[title] = price
+        current_prices.append({"title": title, "price": price})
 
         if price is not None and target_price and price <= int(target_price):
             # Hedef fiyatın altında olduğu bilgisini ekleyelim
@@ -223,13 +223,42 @@ def check_prices_and_send(products):
     if email_body:
         email_manager.send_mail(email_body)
 
-    with open("newProducts.json", "w") as file:
+    with open("jsons/newProducts.json", "w") as file:
         json.dump(current_prices, file, indent=4)
 
 
 try:
-    with open("newProducts.json", "r") as file:
+    with open("jsons/newProducts.json", "r") as file:
         pass  # Dosya zaten var, bu yüzden bir şey yapmamıza gerek yok
 except FileNotFoundError:
-    with open("newProducts.json", "w") as file:
+    with open("jsons/newProducts.json", "w") as file:
+        json.dump({}, file)
+
+
+def check_prices_and_send_current(current_prices):
+    email_body = ""
+    for product in current_prices[:-1]:  # "saved_time" anahtarını dikkate alma
+        title = product["title"]
+        URL = product["URL"]
+        price = product["price"]
+
+        # Önceden kaydedilmiş fiyatlar ile karşılaştırma yap
+        saved_price = next(
+            (item["price"] for item in current_prices[:-1] if item["title"] == title),
+            None,
+        )
+
+        if saved_price is not None and price < saved_price:
+            # Önceden kaydedilen fiyattan daha düşükse e-posta gönder
+            email_body += f"{title} - {URL} - {price}₺\n"
+
+    if email_body:
+        email_manager.send_mail(email_body)
+
+
+try:
+    with open("jsons/newProducts.json", "r") as file:
+        pass  # Dosya zaten var, bu yüzden bir şey yapmamıza gerek yok
+except FileNotFoundError:
+    with open("jsons/newProducts.json", "w") as file:
         json.dump({}, file)
