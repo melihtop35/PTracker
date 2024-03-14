@@ -349,7 +349,7 @@ def open_settings():
         open_settings()
 
     settings_window = tk.Toplevel(root)
-    settings_window.geometry("+600+300")
+    settings_window.geometry("+800+300")
 
     toggle_label_minimize = tk.Label(
         settings_window,
