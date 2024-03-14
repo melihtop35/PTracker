@@ -1,6 +1,7 @@
 {
     "Türkçe": {
       "app_title": "Uygulama Başlığı",
+      "add_product_window_title":"Ürünleri Ekle",
       "add_product_text": "Ürün Ekle",
       "edit_products_text": "Ürünleri Düzenle",
       "check_button_text": "Fiyatları Kontrol Et",
@@ -51,6 +52,7 @@
     },
     "English": {
       "app_title": "Application Title",
+      "add_product_window_title":"Add Products",
       "add_product_text": "Add Product",
       "edit_products_text": "Edit Products",
       "check_button_text": "Check Prices",

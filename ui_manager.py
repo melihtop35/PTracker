@@ -30,36 +30,43 @@ def open_add_product_window(products):
     add_product_window = tk.Toplevel()
     add_product_window.title(get_language_data("add_product_window_title"))
     add_product_window.geometry("300x300+800+300")
+    # Pencerenin minimum  ve maximum genişlik ve yükseklik değerlerini ayarla
+    add_product_window.minsize(300, 300)
+    add_product_window.maxsize(500, 400)
 
     link_label = tk.Label(add_product_window, text=get_language_data("link_label"))
-    link_label.pack(pady=5)
+    link_label.pack(pady=5, fill=tk.X)
 
     global link_entry
     link_entry = tk.Entry(add_product_window)
-    link_entry.pack(pady=5)
+    link_entry.pack(pady=10, padx=(80, 80), fill=tk.X)
 
     name_label = tk.Label(add_product_window, text=get_language_data("name_label"))
-    name_label.pack(pady=5)
+    name_label.pack(pady=5, fill=tk.X)
 
     global name_entry
     name_entry = tk.Entry(add_product_window)
-    name_entry.pack(pady=5)
+    name_entry.pack(pady=10, padx=(80, 80), fill=tk.X)
 
     target_price_label = tk.Label(
         add_product_window, text=get_language_data("target_price_label")
     )
-    target_price_label.pack(pady=5)
+    target_price_label.pack(pady=5, fill=tk.X)
 
     global target_price_entry
     target_price_entry = tk.Entry(add_product_window)
-    target_price_entry.pack(pady=5)
+    target_price_entry.pack(pady=10, padx=(80, 80), fill=tk.X)
 
     add_button = tk.Button(
         add_product_window,
         text=get_language_data("add_button_text"),
         command=lambda: add_product_and_close(add_product_window, products),
     )
-    add_button.pack(pady=5)
+    add_button.pack(pady=10, padx=(80, 80), fill=tk.X)
+
+    add_product_window.transient(root)
+    add_product_window.grab_set()
+    root.wait_window(add_product_window)
 
 
 def add_product_and_close(window, products):
@@ -96,7 +103,6 @@ def add_product_and_close(window, products):
         )
 
 
-# Ürünleri düzenleme penceresini açma
 def open_edit_products_window(products):
     def delete_product(index):
         del products[index]
@@ -111,7 +117,7 @@ def open_edit_products_window(products):
     edit_products_window = tk.Toplevel()
     edit_products_window.title(get_language_data("edit_products_window_title"))
     edit_products_window.geometry("940x400+400+300")
-
+    edit_products_window.minsize(940, 400)
     scroll_frame = tk.Frame(edit_products_window)
     scroll_frame.pack(fill="both", expand=True)
 
@@ -134,35 +140,35 @@ def open_edit_products_window(products):
 
     for i, product in enumerate(products):
         tk.Label(inner_frame, text=f"{get_language_data('product')} {i+1}").grid(
-            row=i, column=0, padx=5, pady=5
+            row=i, column=0, padx=5, pady=5, sticky="e"
         )
 
         tk.Label(inner_frame, text=get_language_data("name_label")).grid(
-            row=i, column=1, padx=5, pady=5
+            row=i, column=1, padx=(5, 0), pady=5, sticky="e"
         )
         name_entry = tk.Entry(inner_frame, width=40)
         name_entry.insert(0, product.get("name", ""))
-        name_entry.grid(row=i, column=2, padx=5, pady=5)
+        name_entry.grid(row=i, column=2, padx=5, pady=5, sticky="w")
 
         tk.Label(inner_frame, text=get_language_data("link_label")).grid(
-            row=i, column=3, padx=5, pady=5
+            row=i, column=3, padx=(5, 0), pady=5, sticky="e"
         )
         link_entry = tk.Entry(inner_frame, width=40)
         link_entry.insert(0, product.get("URL", ""))
-        link_entry.grid(row=i, column=4, padx=5, pady=5)
+        link_entry.grid(row=i, column=4, padx=5, pady=5, sticky="w")
 
         tk.Label(inner_frame, text=get_language_data("target_price_label")).grid(
-            row=i, column=5, padx=5, pady=5
+            row=i, column=5, padx=(5, 0), pady=5, sticky="e"
         )
         target_price_entry = tk.Entry(inner_frame, width=10)
         target_price_entry.insert(0, str(product.get("target_price", "")))
-        target_price_entry.grid(row=i, column=6, padx=5, pady=5)
+        target_price_entry.grid(row=i, column=6, padx=5, pady=5, sticky="w")
 
         delete_button = tk.Button(
             inner_frame,
             text=get_language_data("delete_button_text"),
             command=lambda index=i: delete_product(index),
-            width=5,
+            width=7,
         )
         delete_button.grid(row=i, column=7, padx=5, pady=5)
 
@@ -222,6 +228,10 @@ def show_current_prices(products):
 
     current_prices_window.protocol("WM_DELETE_WINDOW", restart_app)
 
+    current_prices_window.transient(root)
+    current_prices_window.grab_set()
+    root.wait_window(current_prices_window)
+
 
 def show_saved_products(root):
     saved_prices_frame = tk.Frame(root)
@@ -259,6 +269,7 @@ def open_settings():
             toggle_button_minimize.config(text=get_language_data("on_text"))
         else:
             toggle_button_minimize.config(text=get_language_data("off_text"))
+        update_window_size()
 
     def update_button_text():
         current_text = settings["button_text"]
@@ -276,16 +287,19 @@ def open_settings():
         )
         settings["button_text"] = str(next_number)
         save_settings_to_json(settings)
+        update_window_size()
 
     def change_language(language):
         if language == "Türkçe":
             settings["language"] = "Türkçe"
             save_settings_to_json(settings)
             update_language(settings["language"])
+            update_window_size()
         elif language == "English":
             settings["language"] = "English"
             save_settings_to_json(settings)
             update_language(settings["language"])
+            update_window_size()
 
     def update_language(language):
         with open("jsons/language_data.json", "r", encoding="utf-8") as lang_file:
@@ -308,8 +322,34 @@ def open_settings():
             )
             toggle_label_lang.config(text=lang_texts["language_label"])
 
+    def update_window_size():
+        # İçeriğin uzunluğuna göre pencere boyutunu güncelle
+        settings_window.update_idletasks()
+        width = max(
+            settings_window.winfo_width(),
+            toggle_label_minimize.winfo_reqwidth(),
+            toggle_button_minimize.winfo_reqwidth(),
+            toggle_label_timer.winfo_reqwidth(),
+            toggle_button_timer.winfo_reqwidth(),
+            toggle_label_lang.winfo_reqwidth(),
+            language_menu.winfo_reqwidth(),
+        )
+        height = max(
+            settings_window.winfo_height(),
+            toggle_label_minimize.winfo_reqheight(),
+            toggle_button_minimize.winfo_reqheight(),
+            toggle_label_timer.winfo_reqheight(),
+            toggle_button_timer.winfo_reqheight(),
+            toggle_label_lang.winfo_reqheight(),
+            language_menu.winfo_reqheight(),
+        )
+        settings_window.minsize(width, height)
+        settings_window.maxsize(width, height)
+        settings_window.destroy()
+        open_settings()
+
     settings_window = tk.Toplevel(root)
-    settings_window.geometry("330x150+500+300")
+    settings_window.geometry("+600+300")
 
     toggle_label_minimize = tk.Label(
         settings_window,
@@ -352,6 +392,7 @@ def open_settings():
         font=("Arial", 12),
     )
     toggle_label_lang.grid(row=2, column=0, sticky="w", padx=10, pady=5)
+
     language_options = ["Türkçe", "English"]
     selected_language = tk.StringVar()
     selected_language.set(settings["language"])
@@ -363,6 +404,9 @@ def open_settings():
     settings_window.wm_protocol("WM_DELETE_WINDOW", restart_app)
 
     update_language(settings["language"])
+    settings_window.transient(root)
+    settings_window.grab_set()  # Modal pencereyi aç
+    root.wait_window(settings_window)  # Pencere kapanana kadar beklet
 
 
 def main():
@@ -374,7 +418,8 @@ def main():
     root = tk.Tk()
     root.configure(bg="lightgray")
     root.title(get_language_data("app_title"))
-    root.geometry("+300+300")
+    root.geometry("+500+300")
+    root.minsize(300, 150)
 
     def show_icon():
         def on_clicked(icon, item):

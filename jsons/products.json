@@ -12,16 +12,21 @@
     {
         "name": "RTX 2060 Super",
         "URL": "https://www.letgo.com/item/rtx-2060-super-ekran-karti-iid-1635603332",
-        "target_price": 10000.0
+        "target_price": 6000.0
     },
     {
         "name": "AMD Ryzen 5 5600",
         "URL": "https://www.akakce.com/islemci/en-ucuz-amd-ryzen-5-5600-alti-cekirdek-3-50-ghz-fiyati,1782415463.html",
-        "target_price": 10000.0
+        "target_price": 3900.0
     },
     {
-        "name": "RTX 3060",
-        "URL": "https://www.letgo.com/item/rtx-3060-zotac-iid-1675008306",
-        "target_price": 10000.0
+        "name": "Asus Prime B650M-K AMD",
+        "URL": "https://www.akakce.com/anakart/en-ucuz-asus-prime-b650m-k-amd-am5-ddr5-micro-atx-fiyati,256378121.html",
+        "target_price": 5300.0
+    },
+    {
+        "name": "MSI Pro A620M-E AMD AM5",
+        "URL": "https://www.akakce.com/anakart/en-ucuz-msi-pro-a620m-e-amd-am5-ddr5-mikro-atx-fiyati,256377300.html",
+        "target_price": 3300.0
     }
 ]
