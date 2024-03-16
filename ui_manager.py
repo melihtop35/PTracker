@@ -194,6 +194,20 @@ def show_current_prices(products):
     current_prices_window.geometry("+300+300")
 
     current_prices = []
+
+    # Scrollbar'ı eklemek için bir Canvas oluştur
+    canvas = tk.Canvas(current_prices_window)
+    canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+    # Scrollbar oluştur
+    scrollbar = tk.Scrollbar(current_prices_window, orient=tk.VERTICAL, command=canvas.yview)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    canvas.configure(yscrollcommand=scrollbar.set)
+
+    # Frame içine fiyatları listeleyen etiketleri ekleyin
+    inner_frame = tk.Frame(canvas)
+    canvas.create_window((0, 0), window=inner_frame, anchor="nw")
+
     for product in products:
         URL = product["URL"]
         if "amazon" in URL:
@@ -212,10 +226,18 @@ def show_current_prices(products):
         current_prices.append({"title": title, "URL": URL, "price": price})
 
         label_text = f"{title} - {price}₺"
-        tk.Label(current_prices_window, text=label_text, font=("Arial", 10)).pack(
-            pady=5, padx=5
-        )
-        tk.Frame(current_prices_window, height=1, bg="black").pack(fill="x")
+        label = tk.Label(inner_frame, text=label_text, font=("Arial", 10))
+        label.pack(pady=5, padx=5, anchor="w")
+
+        tk.Frame(inner_frame, height=1, bg="black").pack(fill="x")
+
+    # Canvas boyutunu ayarlayın
+    inner_frame.update_idletasks()
+    canvas.config(scrollregion=canvas.bbox("all"))
+
+    # Frame'in genişliğini ayarlayın
+    max_label_width = max(label.winfo_width() for label in inner_frame.winfo_children())
+    canvas.config(width=max_label_width + scrollbar.winfo_width())
 
     saved_time = datetime.now().strftime("%d-%m-%y %H:%M:%S")
     current_prices.append({"saved_time": saved_time})
@@ -243,20 +265,47 @@ def show_saved_products(root):
     except FileNotFoundError:
         saved_data = []
 
+    # En geniş yazının uzunluğunu bul
+    max_width = 0
     for item in saved_data:
-        if "saved_time" not in item:
+        if "title" in item:
+            width = len(item["title"])
+            if width > max_width:
+                max_width = width
+
+    # Scrollbar'ı eklemek için bir Canvas oluştur
+    canvas = tk.Canvas(saved_prices_frame)
+    canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+    # Scrollbar oluştur
+    scrollbar = tk.Scrollbar(saved_prices_frame, orient=tk.VERTICAL, command=canvas.yview)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    canvas.configure(yscrollcommand=scrollbar.set)
+
+    # Frame içine fiyatları listeleyen etiketleri ekleyin
+    inner_frame = tk.Frame(canvas)
+    canvas.create_window((0, 0), window=inner_frame, anchor="nw")
+
+    for item in saved_data:
+        if "title" in item:
             label_text = f"{item['title']} - {item['price']}₺"
-            tk.Label(saved_prices_frame, text=label_text, font=("Arial", 10)).pack(
-                pady=5, padx=5
-            )
-            tk.Frame(saved_prices_frame, height=1, bg="black").pack(fill="x")
-        else:
-            time_label = tk.Label(
-                saved_prices_frame,
-                text=f"{get_language_data('saved_time_label')}: {item['saved_time']}",
-                font=("Arial", 10),
-            )
-            time_label.pack(pady=10)
+            label = tk.Label(inner_frame, text=label_text, font=("Arial", 10))
+            label.pack(pady=5, padx=5, anchor="w")
+
+            # Etiketin genişliğini ayarla
+            label.update_idletasks()
+            label_width = label.winfo_width()
+            if label_width > max_width:
+                max_width = label_width
+
+            tk.Frame(inner_frame, height=1, bg="black").pack(fill="x")
+
+    # Canvas boyutunu ayarlayın
+    inner_frame.update_idletasks()
+    canvas.config(scrollregion=canvas.bbox("all"))
+
+    # Frame'in genişliğini ayarlayın
+    canvas.config(width=max_width + scrollbar.winfo_width())
 
 
 def open_settings():
