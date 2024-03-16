@@ -35,5 +35,5 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     uac_admin=True,
-    icon=['form.ico'],
+    icon=['icons\\form.ico'],
 )

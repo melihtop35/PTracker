@@ -46,7 +46,10 @@ def send_mail(body):
     msg = msg.encode("utf-8")
 
     server.sendmail(sender_email, receiver_email, msg)
-    server.quit()
+    server.quit(
+        get_language_data("mbox_info_success1"), get_language_data("mbox_email_send")
+    )
+    messagebox.showinfo()
 
 
 def add_email():
