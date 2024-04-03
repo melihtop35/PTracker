@@ -11,7 +11,7 @@ def load_settings_from_json():
         with open("jsons/settings.json", "r", encoding="utf-8") as file:
             return json.load(file)
     except FileNotFoundError:
-        return {"minimize_to_tray": False, "button_text": "600", "language": "Türkçe"}
+        return {"minimize_to_tray": False, "button_text": "600", "language": "English"}
 
 
 def get_language_data(key):

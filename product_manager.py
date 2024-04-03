@@ -54,4 +54,3 @@ def update_products(products, inner_frame, edit_products_window):
     messagebox.showinfo(
         get_language_data("mbox_info_success1"), get_language_data("item_success")
     )
-    edit_products_window.destroy()  # Sekmeyi kapat
