@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 import email_manager as email_manager
 import time, random
 from settings import get_language_data
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 
 
 def add_one_if_last_digit_is_nine(number):
@@ -87,39 +89,42 @@ def akakce_product_info(URL):
 
 
 def hepsiburada_product_info(URL):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.1"
-    }
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")  # Başlıksız modda çalıştırmak için
+    options.add_argument(
+        "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36"
+    )
 
-    # Farklı parser'ları sırayla deneyelim
-    parsers = ["html.parser", "lxml", "html5lib"]
-    for parser in parsers:
-        try:
-            page = requests.get(URL, headers=headers)
-            soup = BeautifulSoup(page.text, parser)
+    # Selenium'un Chrome WebDriver'ını başlatın
+    driver = webdriver.Chrome(options=options)
+    # URL'ye git
+    driver.get(URL)
 
-            title_tag = soup.find("h1", class_="product-name")
-            if title_tag:
-                title = title_tag.get_text().strip()
+    # Ürün adını ve fiyatını bulmak için XPath'leri kullanarak elementleri bul
+    try:
+        product_name = driver.find_element(
+            By.XPATH,
+            "/html/body/div[2]/main/div[3]/section[3]/div/div/div[1]/h2",
+        ).text.strip()
 
-            price_tag = soup.find(
-                "span", {"data-bind": "markupText:'currentPriceBeforePoint'"}
-            )
-            if price_tag:
-                price_text = price_tag.get_text()
-                price_text = price_text.split(",")[0]
-                price = int(price_text.replace("TL", "").replace(".", "").strip())
-                price = add_one_if_last_digit_is_nine(price)
+        product_price = driver.find_element(
+            By.XPATH,
+            "/html/body/div[2]/main/div[3]/section[1]/div[3]/div/div[4]/div[1]/div[2]/div/div[1]/div[1]/span/span[1]",
+        ).text.strip()
+        product_name = product_name.replace("Özellikleri", "")
 
-            # 1 veya 2 saniye arası rastgele bir gecikme ekle
-            time.sleep(random.uniform(0.25, 1))
+        # WebDriver'ı kapat
+        driver.quit()
 
-            return title, price
-        except Exception as e:
-            print(f"Parser {parser} ile çekme sırasında hata: {e}")
+        index = product_name.find("Fiyatı")
+        if index != -1:
+            # Alt dizge bulunduysa, çıkarıp yazdır
+            product_name = product_name[index : index + len("Fiyatı")]
 
-    # Tüm parser'lar denenip başarısız olursa None döndür
-    return get_language_data("product_not_found"), None
+        return product_name, product_price
+    except:
+        # Tüm parser'lar denenip başarısız olursa None döndür
+        return get_language_data("product_not_found"), None
 
 
 def trendyol_product_info(URL):
