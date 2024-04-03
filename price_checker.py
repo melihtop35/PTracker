@@ -1,11 +1,9 @@
 import json
-import requests
-from bs4 import BeautifulSoup
 import email_manager as email_manager
-import time, random
 from settings import get_language_data
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+import concurrent.futures
 
 
 def add_one_if_last_digit_is_nine(number):
@@ -21,71 +19,75 @@ def add_one_if_last_digit_is_nine(number):
 
 
 def amazon_product_info(URL):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.1"
-    }
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")  # Başlıksız modda çalıştırmak için
+    options.add_argument(
+        "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36"
+    )
 
-    # Farklı parser'ları sırayla deneyelim
-    parsers = ["html.parser", "lxml", "html5lib"]
-    for parser in parsers:
-        try:
-            page = requests.get(URL, headers=headers)
-            soup = BeautifulSoup(page.content, parser)
+    # Selenium'un Chrome WebDriver'ını başlatın
+    driver = webdriver.Chrome(options=options)
+    # URL'ye git
+    driver.get(URL)
 
-            title = soup.find("span", id="productTitle")
-            if title:
-                title = title.get_text().strip()
+    # Ürün adını ve fiyatını bulmak için XPath'leri kullanarak elementleri bul
+    try:
+        product_name = driver.find_element(
+            By.XPATH,
+            "/html/body/div[2]/div/div[7]/div[3]/div[4]/div[1]/div/h1/span",
+        ).text.strip()
 
-            price_tag = soup.find("span", class_="a-price-whole")
-            if price_tag:
-                price_text = price_tag.get_text()
-                price_text = price_text.split(",")[0]
-                price = int(price_text.replace("TL", "").replace(".", "").strip())
-                price = add_one_if_last_digit_is_nine(price)
+        product_price = driver.find_element(
+            By.XPATH,
+            "/html/body/div[2]/div/div[7]/div[3]/div[4]/div[12]/div/div/div[3]/div[1]/span[2]/span[2]/span[1]",
+        ).text.strip()
+        product_price = product_price.split(",")[0]
+        product_price = int(product_price.replace("TL", "").replace(".", "").strip())
+        product_price = add_one_if_last_digit_is_nine(product_price)
 
-            # 1 veya 2 saniye arası rastgele bir gecikme ekle
-            time.sleep(random.uniform(0.25, 1))
+        # WebDriver'ı kapat
+        driver.quit()
 
-            return title, price
-        except Exception as e:
-            print(f"Parser {parser} ile çekme sırasında hata: {e}")
-
-    # Tüm parser'lar denenip başarısız olursa None döndür
-    return get_language_data("product_not_found"), None
+        return product_name, product_price
+    except:
+        # Tüm parser'lar denenip başarısız olursa None döndür
+        return get_language_data("product_not_found"), None
 
 
 def akakce_product_info(URL):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.1"
-    }
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")  # Başlıksız modda çalıştırmak için
+    options.add_argument(
+        "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36"
+    )
 
-    # Farklı parser'ları sırayla deneyelim
-    parsers = ["html.parser", "lxml", "html5lib"]
-    for parser in parsers:
-        try:
-            page = requests.get(URL, headers=headers)
-            soup = BeautifulSoup(page.content, parser)
+    # Selenium'un Chrome WebDriver'ını başlatın
+    driver = webdriver.Chrome(options=options)
+    # URL'ye git
+    driver.get(URL)
 
-            title_tag = soup.find("h1")
-            if title_tag:
-                title = title_tag.get_text().strip()
+    # Ürün adını ve fiyatını bulmak için XPath'leri kullanarak elementleri bul
+    try:
+        product_name = driver.find_element(
+            By.XPATH,
+            "/html/body/main/div[1]/div[1]/div[1]/h1",
+        ).text.strip()
 
-            price_tag = soup.find("span", class_="pt_v8")
-            if price_tag:
-                price_text = price_tag.get_text()
-                price_text = price_text.split(",")[0]
-                price = int(price_text.replace("TL", "").replace(".", "").strip())
-                price = add_one_if_last_digit_is_nine(price)
+        product_price = driver.find_element(
+            By.XPATH,
+            "/html/body/main/div[1]/div[1]/div[3]/span[1]/span",
+        ).text.strip()
+        product_price = product_price.split(",")[0]
+        product_price = int(product_price.replace("TL", "").replace(".", "").strip())
+        product_price = add_one_if_last_digit_is_nine(product_price)
 
-            # 1 veya 2 saniye arası rastgele bir gecikme ekle
-            time.sleep(random.uniform(0.25, 1))
+        # WebDriver'ı kapat
+        driver.quit()
 
-            return title, price
-        except Exception as e:
-            print(f"Parser {parser} ile çekme sırasında hata: {e}")
-
-    # Tüm parser'lar denenip başarısız olursa None döndür
-    return get_language_data("product_not_found"), None
+        return product_name, product_price
+    except:
+        # Tüm parser'lar denenip başarısız olursa None döndür
+        return get_language_data("product_not_found"), None
 
 
 def hepsiburada_product_info(URL):
@@ -112,14 +114,12 @@ def hepsiburada_product_info(URL):
             "/html/body/div[2]/main/div[3]/section[1]/div[3]/div/div[4]/div[1]/div[2]/div/div[1]/div[1]/span/span[1]",
         ).text.strip()
         product_name = product_name.replace("Özellikleri", "")
+        product_price = product_price.split(",")[0]
+        product_price = int(product_price.replace("TL", "").replace(".", "").strip())
+        product_price = add_one_if_last_digit_is_nine(product_price)
 
         # WebDriver'ı kapat
         driver.quit()
-
-        index = product_name.find("Fiyatı")
-        if index != -1:
-            # Alt dizge bulunduysa, çıkarıp yazdır
-            product_name = product_name[index : index + len("Fiyatı")]
 
         return product_name, product_price
     except:
@@ -128,81 +128,82 @@ def hepsiburada_product_info(URL):
 
 
 def trendyol_product_info(URL):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.1"
-    }
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")  # Başlıksız modda çalıştırmak için
+    options.add_argument(
+        "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36"
+    )
 
-    # Farklı parser'ları sırayla deneyelim
-    parsers = ["html.parser", "lxml", "html5lib"]
-    for parser in parsers:
-        try:
-            page = requests.get(URL, headers=headers)
-            soup = BeautifulSoup(page.content, parser)
+    # Selenium'un Chrome WebDriver'ını başlatın
+    driver = webdriver.Chrome(options=options)
+    # URL'ye git
+    driver.get(URL)
 
-            title_tag = soup.find("h1", class_="pr-new-br")
-            if title_tag:
-                title = title_tag.get_text().strip()
+    # Ürün adını ve fiyatını bulmak için XPath'leri kullanarak elementleri bul
+    try:
+        product_name = driver.find_element(
+            By.XPATH,
+            "/html/body/div[1]/div[5]/main/div/div[2]/div/div[2]/div[2]/div/div[1]/div[1]/div/div/div[1]/h1",
+        ).text.strip()
 
-            price_tag = soup.find("div", class_="product-price-container")
-            if price_tag:
-                price_text = price_tag.get_text()
-                price_text = price_text.split(",")[0]
-                price = int(price_text.replace("TL", "").replace(".", "").strip())
-                price = add_one_if_last_digit_is_nine(price)
+        product_price = driver.find_element(
+            By.XPATH,
+            "/html/body/div[1]/div[5]/main/div/div[2]/div/div[2]/div[2]/div/div[1]/div[1]/div/div/div[3]/div/div/span",
+        ).text.strip()
+        product_price = product_price.split(",")[0]
+        product_price = int(product_price.replace("TL", "").replace(".", "").strip())
+        product_price = add_one_if_last_digit_is_nine(product_price)
 
-            # 1 veya 2 saniye arası rastgele bir gecikme ekle
-            time.sleep(random.uniform(0.25, 1))
+        # WebDriver'ı kapat
+        driver.quit()
 
-            return title, price
-        except Exception as e:
-            print(f"Parser {parser} ile çekme sırasında hata: {e}")
-
-    # Tüm parser'lar denenip başarısız olursa None döndür
-    return get_language_data("product_not_found"), None
+        return product_name, product_price
+    except:
+        # Tüm parser'lar denenip başarısız olursa None döndür
+        return get_language_data("product_not_found"), None
 
 
 def letgo_product_info(URL):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.1"
-    }
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")  # Başlıksız modda çalıştırmak için
+    options.add_argument(
+        "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36"
+    )
 
-    # Farklı parser'ları sırayla deneyelim
-    parsers = ["html.parser", "lxml", "html5lib"]
-    for parser in parsers:
-        try:
-            page = requests.get(URL, headers=headers)
-            soup = BeautifulSoup(page.content, parser)
+    # Selenium'un Chrome WebDriver'ını başlatın
+    driver = webdriver.Chrome(options=options)
+    # URL'ye git
+    driver.get(URL)
 
-            title_tag = soup.find("h1", class_="_1hJph")
-            if title_tag:
-                title = title_tag.get_text().strip()
+    # Ürün adını ve fiyatını bulmak için XPath'leri kullanarak elementleri bul
+    try:
+        product_name = driver.find_element(
+            By.XPATH,
+            "/html/body/div[1]/div/main/div/div/div/div[5]/div[1]/div/section/h1",
+        ).text.strip()
 
-            price_tag = soup.find("span", class_="T8y-z")
-            if price_tag:
-                price_text = price_tag.get_text()
-                price_text = price_text.split(",")[0]
-                price = int(price_text.replace("TL", "").replace(".", "").strip())
-                price = add_one_if_last_digit_is_nine(price)
+        product_price = driver.find_element(
+            By.XPATH,
+            "/html/body/div[1]/div/main/div/div/div/div[5]/div[1]/div/section/span",
+        ).text.strip()
+        product_price = product_price.split(",")[0]
+        product_price = int(product_price.replace("TL", "").replace(".", "").strip())
+        product_price = add_one_if_last_digit_is_nine(product_price)
 
-            # 1 veya 2 saniye arası rastgele bir gecikme ekle
-            time.sleep(random.uniform(0.25, 1))
+        # WebDriver'ı kapat
+        driver.quit()
 
-            return title, price
-        except Exception as e:
-            print(f"Parser {parser} ile çekme sırasında hata: {e}")
-
-    # Tüm parser'lar denenip başarısız olursa None döndür
-    return get_language_data("product_not_found"), None
+        return product_name, product_price
+    except:
+        # Tüm parser'lar denenip başarısız olursa None döndür
+        return get_language_data("product_not_found"), None
 
 
 def check_prices_and_send(products):
     email_body = ""
     current_prices = []
-    for product in products:
-        URL = product["URL"]
-        target_price = product["target_price"]
 
-        # URL'ye göre doğru işlevi çağır
+    def fetch_product_info(URL):
         if "amazon" in URL:
             title, price = amazon_product_info(URL)
         elif "hepsiburada" in URL:
@@ -214,30 +215,41 @@ def check_prices_and_send(products):
         elif "letgo" in URL:
             title, price = letgo_product_info(URL)
         else:
-            title, price = get_language_data("unkown_product"), 0
+            title, price = get_language_data("unknown_product"), 0
+        return title, price
 
-        current_prices.append({"title": title, "price": price})
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        future_to_product = {
+            executor.submit(fetch_product_info, product["URL"]): product
+            for product in products
+        }
+        for future in concurrent.futures.as_completed(future_to_product):
+            product = future_to_product[future]
+            try:
+                title, price = future.result()
+                current_prices.append({"title": title, "price": price})
 
-        if price is not None and target_price and price <= int(target_price):
-            # Hedef fiyatın altında olduğu bilgisini ekleyelim
-            price_difference = int(target_price) - price
-            email_body += get_language_data("email_content").format(
-                title, price, target_price, price_difference, URL
-            )
+                if (
+                    price is not None
+                    and product["target_price"]
+                    and price <= int(product["target_price"])
+                ):
+                    price_difference = int(product["target_price"]) - price
+                    email_body += get_language_data("email_content").format(
+                        title,
+                        price,
+                        product["target_price"],
+                        price_difference,
+                        product["URL"],
+                    )
+            except Exception as exc:
+                print(exc)
 
     if email_body:
         email_manager.send_mail(email_body)
 
     with open("jsons/newProducts.json", "w") as file:
         json.dump(current_prices, file, indent=4)
-
-
-try:
-    with open("jsons/newProducts.json", "r") as file:
-        pass  # Dosya zaten var, bu yüzden bir şey yapmamıza gerek yok
-except FileNotFoundError:
-    with open("jsons/newProducts.json", "w") as file:
-        json.dump({}, file)
 
 
 def check_prices_and_send_current(current_prices):

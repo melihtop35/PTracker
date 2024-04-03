@@ -1,6 +1,7 @@
 import tkinter as tk
 import json
 import pystray
+import concurrent.futures
 import PIL.Image
 import time
 import threading
@@ -195,54 +196,61 @@ def show_current_prices(products):
 
     current_prices = []
 
-    # Scrollbar'ı eklemek için bir Canvas oluştur
     canvas = tk.Canvas(current_prices_window)
     canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-    # Scrollbar oluştur
-    scrollbar = tk.Scrollbar(current_prices_window, orient=tk.VERTICAL, command=canvas.yview)
+    scrollbar = tk.Scrollbar(
+        current_prices_window, orient=tk.VERTICAL, command=canvas.yview
+    )
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
     canvas.configure(yscrollcommand=scrollbar.set)
 
-    # Frame içine fiyatları listeleyen etiketleri ekleyin
     inner_frame = tk.Frame(canvas)
     canvas.create_window((0, 0), window=inner_frame, anchor="nw")
 
-    for product in products:
-        URL = product["URL"]
+    def fetch_product_info(URL):
         if "amazon" in URL:
-            title, price = amazon_product_info(URL)
+            return amazon_product_info(URL)
         elif "hepsiburada" in URL:
-            title, price = hepsiburada_product_info(URL)
+            return hepsiburada_product_info(URL)
         elif "trendyol" in URL:
-            title, price = trendyol_product_info(URL)
+            return trendyol_product_info(URL)
         elif "letgo" in URL:
-            title, price = letgo_product_info(URL)
+            return letgo_product_info(URL)
         elif "akakce" in URL:
-            title, price = akakce_product_info(URL)
+            return akakce_product_info(URL)
         else:
-            return
+            return None
 
-        current_prices.append({"title": title, "URL": URL, "price": price})
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        future_to_url = {
+            executor.submit(fetch_product_info, product["URL"]): product
+            for product in products
+        }
+        for future in concurrent.futures.as_completed(future_to_url):
+            product = future_to_url[future]
+            try:
+                title, price = future.result()
+                if title is not None and price is not None:
+                    current_prices.append(
+                        {"title": title, "URL": product["URL"], "price": price}
+                    )
+                    label_text = f"{title} - {price}₺"
+                    label = tk.Label(inner_frame, text=label_text, font=("Arial", 10))
+                    label.pack(pady=5, padx=5, anchor="w")
+                    tk.Frame(inner_frame, height=1, bg="black").pack(fill="x")
+            except Exception as exc:
+                print(exc)
 
-        label_text = f"{title} - {price}₺"
-        label = tk.Label(inner_frame, text=label_text, font=("Arial", 10))
-        label.pack(pady=5, padx=5, anchor="w")
-
-        tk.Frame(inner_frame, height=1, bg="black").pack(fill="x")
-
-    # Canvas boyutunu ayarlayın
     inner_frame.update_idletasks()
     canvas.config(scrollregion=canvas.bbox("all"))
 
-    # Frame'in genişliğini ayarlayın
     max_label_width = max(label.winfo_width() for label in inner_frame.winfo_children())
     canvas.config(width=max_label_width + scrollbar.winfo_width())
 
     saved_time = datetime.now().strftime("%d-%m-%y %H:%M:%S")
     current_prices.append({"saved_time": saved_time})
 
-    # Önceki fiyatlarla karşılaştırma yap
     check_prices_and_send_current(current_prices)
 
     with open("jsons/newProducts.json", "w", encoding="utf-8") as file:
@@ -278,7 +286,9 @@ def show_saved_products(root):
     canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
     # Scrollbar oluştur
-    scrollbar = tk.Scrollbar(saved_prices_frame, orient=tk.VERTICAL, command=canvas.yview)
+    scrollbar = tk.Scrollbar(
+        saved_prices_frame, orient=tk.VERTICAL, command=canvas.yview
+    )
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
     canvas.configure(yscrollcommand=scrollbar.set)
 
