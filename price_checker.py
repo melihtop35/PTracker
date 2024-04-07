@@ -1,5 +1,6 @@
 import json
 import email_manager as email_manager
+from tkinter import messagebox
 from settings import get_language_data
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -247,7 +248,11 @@ def check_prices_and_send(products):
 
     if email_body:
         email_manager.send_mail(email_body)
-
+    else:
+        if email_body == "":
+            messagebox.showinfo(
+                get_language_data("mbox_info_success1"), get_language_data("no_body")
+            )
     with open("jsons/newProducts.json", "w") as file:
         json.dump(current_prices, file, indent=4)
 

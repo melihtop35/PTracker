@@ -5,7 +5,7 @@ import concurrent.futures
 import PIL.Image
 import time
 import threading
-from tkinter import messagebox
+from tkinter import messagebox, simpledialog
 from datetime import datetime
 from settings import save_settings_to_json, load_settings_from_json, get_language_data
 from product_manager import (
@@ -13,7 +13,7 @@ from product_manager import (
     save_products_to_json,
     update_products,
 )
-from email_manager import add_email
+from email_manager import add_email, get_receiver_email
 from price_checker import (
     amazon_product_info,
     letgo_product_info,
@@ -479,6 +479,9 @@ def main():
     root.title(get_language_data("app_title"))
     root.geometry("+500+300")
     root.minsize(300, 150)
+
+    if get_receiver_email() == None or "":
+        add_email()
 
     def show_icon():
         def on_clicked(icon, item):

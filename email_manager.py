@@ -21,6 +21,7 @@ def get_receiver_email():
         messagebox.showinfo(
             get_language_data("error"), get_language_data("empty_email")
         )
+        return None
 
     return receiver_email
 
@@ -46,10 +47,10 @@ def send_mail(body):
     msg = msg.encode("utf-8")
 
     server.sendmail(sender_email, receiver_email, msg)
+    messagebox.showinfo(get_language_data("mbox_email_send"))
     server.quit(
         get_language_data("mbox_info_success1"), get_language_data("mbox_email_send")
     )
-    messagebox.showinfo()
 
 
 def add_email():
@@ -100,4 +101,7 @@ def add_email():
         if new_email:
             with open("jsons/email.json", "w") as file:
                 json.dump({"email": new_email}, file)
-            messagebox.showinfo(get_language_data("mbox_info_success"))
+            messagebox.showinfo(
+                get_language_data("mbox_info_success1"),
+                get_language_data("mbox_info_success2"),
+            )
