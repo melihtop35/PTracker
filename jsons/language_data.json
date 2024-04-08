@@ -50,7 +50,8 @@
       "product_not_found":"Ürün bulunamadı - İlan silinmiş olabilir",
       "unkown_product":"Bilinmeyen Ürün",
       "email_content":"{} Şimdi {}₺ ({}₺'nin {}₺ altında)\nLinki Kontrol Et: {}\n\n",
-      "no_body":"İndirimli ürün bulunamadı"
+      "no_body":"İndirimli ürün bulunamadı",
+      "share":"Ürünleri Paylaş"
     },
     "English": {
       "app_title": "Application Title",
@@ -103,7 +104,8 @@
       "product_not_found":"Product not found - The advert may have been deleted",
       "unkown_product":"Unkown Product",
       "email_content":"{} is now {}$ ({}$ under target price of {}$)\nCheck the link: {}\n\n",
-      "no_body":"No discounted products found"
+      "no_body":"No discounted products found",
+      "share":"Share Products"
     }
   }
   

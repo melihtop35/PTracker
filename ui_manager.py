@@ -468,6 +468,47 @@ def open_settings():
     root.wait_window(settings_window)  # Pencere kapanana kadar beklet
 
 
+def share_prices():
+    # newProduct.json dosyasından url'leri al ve yazdır
+    try:
+        with open("jsons/newProducts.json", "r") as f:
+            product_data = json.load(f)
+            if isinstance(product_data, list):
+                urls = []
+                for item in product_data:
+                    if isinstance(item, dict):
+                        url = item.get("URL")
+                        if url is not None:
+                            urls.append(url)
+                    else:
+                        print("Geçersiz veri türü: Liste içinde sözlük bekleniyor.")
+
+                # Linkleri göstermek için yeni bir pencere oluştur
+                link_window = tk.Toplevel()
+                link_window.title("Ürün URL'leri")
+                link_window.geometry("1000x500+400+300")
+
+                # Linkleri metin kutusuna ekle
+                link_text = tk.Text(link_window)
+                link_text.pack(expand=True, fill=tk.BOTH)
+                for url in urls:
+                    link_text.insert(tk.END, url + "\n\n")
+
+                # Metin kutusunu kullanıcıya kopyalama imkanı sun
+                copy_button = tk.Button(
+                    link_window,
+                    text="Linkleri Kopyala",
+                    command=lambda: link_text.clipboard_append(
+                        link_text.get("1.0", tk.END)
+                    ),
+                )
+                copy_button.pack()
+            else:
+                print("Geçersiz veri türü: Liste bekleniyor.")
+    except FileNotFoundError:
+        print("newProducts.json dosyası bulunamadı.")
+
+
 def main():
     global settings
     products = load_products_from_json("jsons/products.json")
@@ -558,6 +599,15 @@ def main():
         root,
         text=get_language_data("show_current_prices_button_text"),
         command=lambda: show_current_prices(products),
+        font=("Arial", 10),
+        width=20,
+    )
+    show_current_prices_button.pack(pady=5)
+
+    show_current_prices_button = tk.Button(
+        root,
+        text=get_language_data("share"),
+        command=lambda: share_prices(),
         font=("Arial", 10),
         width=20,
     )
