@@ -469,40 +469,87 @@ def open_settings():
 
 
 def share_prices():
-    # newProduct.json dosyasından url'leri al ve yazdır
     try:
         with open("jsons/newProducts.json", "r") as f:
             product_data = json.load(f)
             if isinstance(product_data, list):
-                urls = []
+                urls_and_prices = []
                 for item in product_data:
                     if isinstance(item, dict):
+                        name = item.get("title")
+                        price = item.get("price")
                         url = item.get("URL")
-                        if url is not None:
-                            urls.append(url)
+                        if name is not None and price is not None and url is not None:
+                            urls_and_prices.append(
+                                {"title": name, "price": price, "URL": url}
+                            )
                     else:
                         print("Geçersiz veri türü: Liste içinde sözlük bekleniyor.")
 
+                # Sıralama fonksiyonları
+                sort_direction_name = False
+                sort_direction_price = False
+
+                def sort_by_name():
+                    nonlocal sort_direction_name
+                    urls_and_prices.sort(
+                        key=lambda x: x["title"], reverse=sort_direction_name
+                    )
+                    sort_direction_name = not sort_direction_name
+                    update_display()
+
+                def sort_by_price():
+                    nonlocal sort_direction_price
+                    urls_and_prices.sort(
+                        key=lambda x: x["price"], reverse=sort_direction_price
+                    )
+                    sort_direction_price = not sort_direction_price
+                    update_display()
+
+                def update_display():
+                    link_text.delete("1.0", tk.END)
+                    for data in urls_and_prices:
+                        link_text.insert(
+                            tk.END,
+                            f"{data['title']}: {data['price']}\n{data['URL']}\n\n",
+                        )
+
                 # Linkleri göstermek için yeni bir pencere oluştur
                 link_window = tk.Toplevel()
-                link_window.title("Ürün URL'leri")
+                link_window.title(get_language_data("url_tittle"))
                 link_window.geometry("1000x500+400+300")
 
                 # Linkleri metin kutusuna ekle
                 link_text = tk.Text(link_window)
                 link_text.pack(expand=True, fill=tk.BOTH)
-                for url in urls:
-                    link_text.insert(tk.END, url + "\n\n")
 
-                # Metin kutusunu kullanıcıya kopyalama imkanı sun
+                # Butonları ekle
+                sort_name_button = tk.Button(
+                    link_window,
+                    text=get_language_data("sort_by_name"),
+                    command=sort_by_name,
+                )
+                sort_name_button.pack(side=tk.LEFT, padx=5, pady=5)
+
+                sort_price_button = tk.Button(
+                    link_window,
+                    text=get_language_data("sort_by_price"),
+                    command=sort_by_price,
+                )
+                sort_price_button.pack(side=tk.LEFT, padx=5, pady=5)
+
+                # Kopyala butonunu ekle
                 copy_button = tk.Button(
                     link_window,
-                    text="Linkleri Kopyala",
+                    text=get_language_data("copy_link"),
                     command=lambda: link_text.clipboard_append(
                         link_text.get("1.0", tk.END)
                     ),
                 )
-                copy_button.pack()
+                copy_button.pack(side=tk.LEFT, padx=5, pady=5)
+
+                update_display()  # Başlangıçta adlara göre sıralı olarak göster
+
             else:
                 print("Geçersiz veri türü: Liste bekleniyor.")
     except FileNotFoundError:

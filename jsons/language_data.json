@@ -51,7 +51,11 @@
       "unkown_product":"Bilinmeyen Ürün",
       "email_content":"{} Şimdi {}₺ ({}₺'nin {}₺ altında)\nLinki Kontrol Et: {}\n\n",
       "no_body":"İndirimli ürün bulunamadı",
-      "share":"Ürünleri Paylaş"
+      "share":"Ürünleri Paylaş",
+      "url_tittle":"Product Links",
+      "sort_by_name":"Ada Göre Sırala",
+      "sort_by_price":"Fiyata Göre Sırala",
+      "copy_link":"Linkleri Kopyala"
     },
     "English": {
       "app_title": "Application Title",
@@ -105,7 +109,11 @@
       "unkown_product":"Unkown Product",
       "email_content":"{} is now {}$ ({}$ under target price of {}$)\nCheck the link: {}\n\n",
       "no_body":"No discounted products found",
-      "share":"Share Products"
+      "share":"Share Products",
+      "url_tittle":"Product Links",
+      "sort_by_name":"Sort By Name",
+      "sort_by_price":"Sort By Price",
+      "copy_link":"Copy Link"
     }
   }
   
