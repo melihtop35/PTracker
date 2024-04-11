@@ -1,11 +1,12 @@
 import tkinter as tk
 import json
+import webbrowser
 import pystray
 import concurrent.futures
 import PIL.Image
 import time
 import threading
-from tkinter import messagebox, simpledialog
+from tkinter import messagebox
 from datetime import datetime
 from settings import save_settings_to_json, load_settings_from_json, get_language_data
 from product_manager import (
@@ -30,8 +31,15 @@ image = PIL.Image.open("icons/form.ico")
 def open_add_product_window(products):
     add_product_window = tk.Toplevel()
     add_product_window.title(get_language_data("add_product_window_title"))
-    add_product_window.geometry("300x300+800+300")
-    # Pencerenin minimum  ve maximum genişlik ve yükseklik değerlerini ayarla
+    screen_width = add_product_window.winfo_screenwidth()
+    screen_height = add_product_window.winfo_screenheight()
+    window_width = 300
+    window_height = 300
+    x_position = (screen_width - window_width) // 2
+    y_position = (screen_height - window_height) // 2
+    add_product_window.geometry(
+        f"{window_width}x{window_height}+{x_position}+{y_position}"
+    )  # Pencerenin minimum  ve maximum genişlik ve yükseklik değerlerini ayarla
     add_product_window.minsize(300, 300)
     add_product_window.maxsize(500, 400)
 
@@ -117,7 +125,15 @@ def open_edit_products_window(products):
 
     edit_products_window = tk.Toplevel()
     edit_products_window.title(get_language_data("edit_products_window_title"))
-    edit_products_window.geometry("940x400+400+300")
+    screen_width = edit_products_window.winfo_screenwidth()
+    screen_height = edit_products_window.winfo_screenheight()
+    window_width = 940
+    window_height = 400
+    x_position = (screen_width - window_width) // 2
+    y_position = (screen_height - window_height) // 2
+    edit_products_window.geometry(
+        f"{window_width}x{window_height}+{x_position}+{y_position}"
+    )
     edit_products_window.minsize(940, 400)
     scroll_frame = tk.Frame(edit_products_window)
     scroll_frame.pack(fill="both", expand=True)
@@ -510,14 +526,36 @@ def share_prices():
                     link_text.delete("1.0", tk.END)
                     for data in urls_and_prices:
                         link_text.insert(
-                            tk.END,
-                            f"{data['title']}: {data['price']}\n{data['URL']}\n\n",
+                            tk.END, f"{data['title']}: {data['price']}\n{data['URL']}\n"
                         )
+                        # Webde Göster butonunu ekle
+                        show_button = tk.Button(
+                            link_window,
+                            text=get_language_data("show_browser"),
+                            command=lambda url=data["URL"]: webbrowser.open_new(url),
+                            bg="#9fb6cd",  # Arkaplan rengi
+                            bd=1,  # Buton kenar kalınlığı
+                            relief=tk.GROOVE,  # Buton kenar stil
+                            padx=5,  # Buton iç yatay padding
+                            pady=2,  # Buton iç dikey padding
+                        )
+                        # Butonu linkin hemen yanına ekle
+                        link_text.window_create(tk.END, window=show_button)
+                        link_text.insert(tk.END, "\n\n")
 
                 # Linkleri göstermek için yeni bir pencere oluştur
                 link_window = tk.Toplevel()
                 link_window.title(get_language_data("url_tittle"))
-                link_window.geometry("1000x500+400+300")
+                screen_width = link_window.winfo_screenwidth()
+                screen_height = link_window.winfo_screenheight()
+                window_width = 1200
+                window_height = 500
+                x_position = (screen_width - window_width) // 2
+                y_position = (screen_height - window_height) // 2
+                link_window.geometry(
+                    f"{window_width}x{window_height}+{x_position}+{y_position}"
+                )
+                link_window.grab_set()  # Diğer pencerelere tıklanamaz
 
                 # Linkleri metin kutusuna ekle
                 link_text = tk.Text(link_window)
@@ -537,7 +575,6 @@ def share_prices():
                     command=sort_by_price,
                 )
                 sort_price_button.pack(side=tk.LEFT, padx=5, pady=5)
-
                 # Kopyala butonunu ekle
                 copy_button = tk.Button(
                     link_window,
@@ -547,7 +584,6 @@ def share_prices():
                     ),
                 )
                 copy_button.pack(side=tk.LEFT, padx=5, pady=5)
-
                 update_display()  # Başlangıçta adlara göre sıralı olarak göster
 
             else:
