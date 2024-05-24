@@ -30,7 +30,7 @@ def send_mail(body):
     if not receiver_email:
         return
 
-    sender_email = "ptracker587@gmail.com"  # Gönderenin e-posta adresi
+    sender_email = ""  # Gönderenin e-posta adresi
     sender_name = "Price Tracker"  # Gönderenin adı
 
     server = smtplib.SMTP("smtp.gmail.com", 587)
@@ -38,7 +38,7 @@ def send_mail(body):
     server.starttls()
     server.ehlo()
     server.login(
-        sender_email, "piia zxxu wctr xczn"
+        sender_email, ""
     )  # Gönderenin e-posta hesabının şifresi
 
     subject = get_language_data("subject")
